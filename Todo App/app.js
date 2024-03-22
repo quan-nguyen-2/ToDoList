@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const todoInput = document.getElementById('todoInput');
   const todoList = document.getElementById('todoList');
 
-  // Load todo list from local storage
   if (localStorage.getItem('todos')) {
     todoList.innerHTML = localStorage.getItem('todos');
     addCheckboxListeners();
+    addDeleteListeners();
   }
 
   form.addEventListener('submit', function (event) {
@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const todoText = todoInput.value;
 
-    if (todoText.trim() !== '') { // Trim to handle whitespace
+    if (todoText.trim() !== '') {
       addTodoItem(todoText);
       todoInput.value = '';
-      saveTodoList(); // Save todo list to local storage
+      saveTodoList();
     }
   });
 
@@ -25,11 +25,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const li = document.createElement('li');
     const todoText = document.createTextNode(text);
     const checkbox = document.createElement('input');
+    const deleteButton = document.createElement('button');
 
-    checkbox.type = 'checkbox'; // Set type before appending to DOM
+    checkbox.type = 'checkbox';
+    deleteButton.textContent = 'Delete';
+    deleteButton.classList.add('delete-button');
+
     li.appendChild(todoText);
     li.appendChild(checkbox);
+    li.appendChild(deleteButton);
     todoList.appendChild(li);
+
+    deleteButton.addEventListener('click', function () {
+      li.remove();
+      saveTodoList();
+    });
 
     checkbox.addEventListener('change', function () {
       if (checkbox.checked) {
@@ -37,16 +47,14 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         li.classList.remove('completed');
       }
-      saveTodoList(); // Save todo list to local storage
+      saveTodoList();
     });
   }
 
-  // Function to save todo list to local storage
   function saveTodoList() {
     localStorage.setItem('todos', todoList.innerHTML);
   }
 
-  // Function to add event listeners to checkboxes
   function addCheckboxListeners() {
     const checkboxes = document.querySelectorAll('#todoList input[type="checkbox"]');
     checkboxes.forEach(function (checkbox) {
@@ -57,8 +65,20 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
           li.classList.remove('completed');
         }
-        saveTodoList(); // Save todo list to local storage
+        saveTodoList();
+      });
+    });
+  }
+
+  function addDeleteListeners() {
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        const li = this.parentNode;
+        li.remove();
+        saveTodoList();
       });
     });
   }
 });
+
